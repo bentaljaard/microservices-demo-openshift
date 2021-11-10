@@ -102,7 +102,7 @@ spec:
         #  periodSeconds: 10
         env:
          - name: ZIPKIN
-           value: zipkin
+           value: jaeger-all-in-one-inmemory-collector
          - name: JAVA_OPTS
            value: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom
          - name: db
@@ -232,7 +232,7 @@ spec:
         #image: weaveworksdemos/catalogue:0.3.5
         #env:
         #- name: ZIPKIN
-        #  value: http://zipkin:9411/api/v1/spans
+        #  value: http://jaeger-all-in-one-inmemory-collector:9411/api/v1/spans
         ports:
         - containerPort: 80
 
@@ -410,7 +410,7 @@ spec:
         image: weaveworksdemos/orders:0.4.7
         env:
          - name: ZIPKIN
-           value: zipkin
+           value: jaeger-all-in-one-inmemory-collector
          - name: JAVA_OPTS
            value: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom
          - name: db
@@ -462,7 +462,7 @@ spec:
         image: weaveworksdemos/payment:0.4.3
         env:
         - name: ZIPKIN
-          value: http://zipkin:9411/api/v1/spans
+          value: http://jaeger-all-in-one-inmemory-collector:9411/api/v1/spans
         ports:
         - containerPort: 80
 
@@ -588,7 +588,7 @@ spec:
         image: weaveworksdemos/shipping:0.4.8
         env:
          - name: ZIPKIN
-           value: zipkin
+           value: jaeger-all-in-one-inmemory-collector
          - name: JAVA_OPTS
            value: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom
         ports:
@@ -635,26 +635,20 @@ spec:
     spec:
       containers:
       - name: user-db
-        image: mosuke5/sockshop-user-db@sha256:7633a123fe2a1e6191fd37cad6d4f07bfb2acdc3a634e27c226df3ae21357da0
+        image: quay.io/bentaljaard/sockshop-user-db:latest
         #image: centos/mongodb-34-centos7
         ports:
         - name: mongo
           containerPort: 27017
         env:
-        - name: MONGODB_USER
-          value: sock-user
-        - name: MONGODB_PASSWORD
-          value: password
-        - name: MONGODB_DATABASE
-          value: users
-        - name: MONGODB_ADMIN_PASSWORD
+        - name: MONGO_INITDB_ROOT_USERNAME
           value: admin
-        - name: MONGODB_BACKUP_USER
-          value: bkuser
-        - name: MONGODB_BACKUP_PASSWORD
+        - name: MONGO_INITDB_ROOT_PASSWORD
           value: password
+        - name: MONGO_INITDB_DATABASE
+          value: users
         volumeMounts:
-        - mountPath: /var/lib/mongodb/data
+        - mountPath: /data/db
           name: users-data
         - mountPath: /tmp
           name: tmp-volume
@@ -726,7 +720,7 @@ spec:
         - name: MONGO_HOST
           value: user-db:27017
         - name: ZIPKIN
-          value: http://zipkin:9411/api/v1/spans
+          value: http://jaeger-all-in-one-inmemory-collector:9411/api/v1/spans
 
 ---
 apiVersion: v1
